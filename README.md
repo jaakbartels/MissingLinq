@@ -27,13 +27,14 @@ The latter is not only easier to read (and write), it will also perform much fas
 Ever written something like :
 
 ```
-var success = processecItems.All(item => !item.HasErrors);
+var success = processedItems.All(item => !item.HasErrors);
 ```
-and ever struggled understanding what it did? Ever overlooked the exclamation point?
+and ever struggled understanding what it did? Never missed the exclamation point?
+
 Compare to:
 
 ```
-var success = processecItems.None(item => item.HasErrors);
+var success = processedItems.None(item => item.HasErrors);
 ``` 
 The difference might seem subtle, yet it makes the code easier to read and better conveys the intention of the programmer.
 
@@ -136,10 +137,6 @@ Builds an Index to speed up subsequent Find() actions. Throws if the same key is
 ---
 ```
 items.WhereKey(item => item.Country).In(allowedCountries)
-```
-
----
-```
 items.WhereKey(item => item.Country).NotIn(allowedCountries)
 ```
 Returns the elements of a list whose key appears (use with .In) or does not appear (use with .NotIn) in another list. WhereKey(...) should allways be followed by either .In(...) or .NotIn(...) 

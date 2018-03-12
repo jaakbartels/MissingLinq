@@ -75,18 +75,10 @@ namespace MissingLinq
             bool Contains(TKey key);
         }
 
-        private class PlainListLookupStrategy : ILookupStrategy
+        private class PlainListLookupStrategy : PreCalculatedHashSetStrategy
         {
-            public PlainListLookupStrategy(IEnumerable<TKey> items)
-            {
-                _lookup = items.ToLookup(x => x);
-            }
-
-            private readonly ILookup<TKey, TKey> _lookup;
-            public bool Contains(TKey key)
-            {
-                return _lookup.Contains(key);
-            }
+            public PlainListLookupStrategy(IEnumerable<TKey> items) : base(new HashSet<TKey>(items))
+            {}
         }
 
         private class PreCalculatedLookupStrategy<TIgnore> : ILookupStrategy

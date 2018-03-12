@@ -9,8 +9,6 @@ namespace MissingLinq
         private readonly IEnumerable<TValue> _leftList;
         private readonly Func<TValue, TKey> _keyFunc;
 
-        private ILookupStrategy _lookupStrategy;
-
         public WhereKeyImplementation(IEnumerable<TValue> leftList, Func<TValue, TKey> keyFunc)
         {
             _leftList = leftList;
@@ -19,55 +17,47 @@ namespace MissingLinq
 
         public IEnumerable<TValue> In(IEnumerable<TKey> rightList)
         {
-            _lookupStrategy = new PlainListLookupStrategy(rightList);
-            return FilterLeftList(shouldBeInRightList: true);
+            return FilterLeftList(new PlainListLookupStrategy(rightList), shouldBeInRightList: true);
         }
 
         public IEnumerable<TValue> NotIn(IEnumerable<TKey> rightList)
         {
-            _lookupStrategy = new PlainListLookupStrategy(rightList);
-            return FilterLeftList(shouldBeInRightList: false);
+            return FilterLeftList(new PlainListLookupStrategy(rightList), shouldBeInRightList: false);
         }
 
         public IEnumerable<TValue> In(HashSet<TKey> rightList)
         {
-            _lookupStrategy = new PreCalculatedHashSetStrategy(rightList);
-            return FilterLeftList(shouldBeInRightList: true);
+            return FilterLeftList(new PreCalculatedHashSetStrategy(rightList), shouldBeInRightList: true);
         }
 
         public IEnumerable<TValue> NotIn(HashSet<TKey> rightList)
         {
-            _lookupStrategy = new PreCalculatedHashSetStrategy(rightList);
-            return FilterLeftList(shouldBeInRightList: false);
+            return FilterLeftList(new PreCalculatedHashSetStrategy(rightList), shouldBeInRightList: false);
         }
 
         public IEnumerable<TValue> In<TIgnore>(ILookup<TKey, TIgnore> lookup)
         {
-            _lookupStrategy = new PreCalculatedLookupStrategy<TIgnore>(lookup);
-            return FilterLeftList(shouldBeInRightList: true);
+            return FilterLeftList(new PreCalculatedLookupStrategy<TIgnore>(lookup), shouldBeInRightList: true);
         }
 
         public IEnumerable<TValue> NotIn<TIgnore>(ILookup<TKey, TIgnore> lookup)
         {
-            _lookupStrategy = new PreCalculatedLookupStrategy<TIgnore>(lookup);
-            return FilterLeftList(shouldBeInRightList: false);
+            return FilterLeftList(new PreCalculatedLookupStrategy<TIgnore>(lookup), shouldBeInRightList: false);
         }
 
         public IEnumerable<TValue> In<TIgnore>(Dictionary<TKey, TIgnore> dictionary)
         {
-            _lookupStrategy = new PreCalculatedDictionaryStrategy<TIgnore>(dictionary);
-            return FilterLeftList(shouldBeInRightList: true);
+            return FilterLeftList(new PreCalculatedDictionaryStrategy<TIgnore>(dictionary), shouldBeInRightList: true);
         }
 
         public IEnumerable<TValue> NotIn<TIgnore>(Dictionary<TKey, TIgnore> dictionary)
         {
-            _lookupStrategy = new PreCalculatedDictionaryStrategy<TIgnore>(dictionary);
-            return FilterLeftList(shouldBeInRightList: false);
+            return FilterLeftList(new PreCalculatedDictionaryStrategy<TIgnore>(dictionary), shouldBeInRightList: false);
         }
 
-        private IEnumerable<TValue> FilterLeftList(bool shouldBeInRightList)
+        private IEnumerable<TValue> FilterLeftList(ILookupStrategy lookupStrategy, bool shouldBeInRightList)
         {
-            return _leftList.Where(v => _lookupStrategy.Contains(_keyFunc(v)) ^ !shouldBeInRightList);
+            return _leftList.Where(v => lookupStrategy.Contains(_keyFunc(v)) ^ !shouldBeInRightList);
         }
 
         interface ILookupStrategy
